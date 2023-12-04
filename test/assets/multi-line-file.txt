@@ -1,0 +1,12 @@
+This is a multi-line file
+
+This is a line.
+This is another line.
+This is a line followed by an empty line.
+
+This is a line proceeded by an empty line.
+
+The next next line will be short.
+short
+The next line will be long.
+This is a long line that repeats itself. This is a long line that repeats itself. This is a long line that repeats itself.

@@ -1,0 +1,3 @@
+[submodule "c-fancy-memory"]
+	path = c-fancy-memory
+	url = https://github.com/BB-301/c-fancy-memory.git
