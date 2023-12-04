@@ -48,8 +48,8 @@
 
 #define IGNORE_UNUSED(x) ((void)(x))
 
-#define FAIL_WITH_MESSAGE(message)                                               \
-    fprintf(stderr, "[libfancy_string failure:%s] %s\n", __FUNCTION__, message); \
+#define FAIL_WITH_MESSAGE(message)                                           \
+    fprintf(stderr, "[libfancy_string failure:%s] %s\n", __func__, message); \
     exit(EXIT_FAILURE)
 
 static void *my_malloc(size_t size);
@@ -1850,8 +1850,8 @@ fancy_string_array_t *fancy_string_array_sliced(fancy_string_array_t const *cons
     assert(self != NULL);
 
     size_t n = fancy_string_array_size(self);
-    size_t index_start = start == -1 ? 0 : start;
-    size_t index_end = end == -1 ? n : end;
+    size_t index_start = (size_t)(start == -1 ? 0 : start);
+    size_t index_end = end == -1 ? n : (size_t)end;
 
     fancy_string_array_t *sliced_array = fancy_string_array_create();
 
@@ -1894,7 +1894,7 @@ fancy_string_array_t *fancy_string_array_splice(fancy_string_array_t *const self
     assert(self != NULL);
 
     size_t n = fancy_string_array_size(self);
-    size_t positive_delete_count = delete_count == -1 ? n - index : delete_count;
+    size_t positive_delete_count = delete_count == -1 ? n - index : (size_t)delete_count;
 
     fancy_string_array_t *removed_strings = fancy_string_array_create();
 

@@ -1,4 +1,11 @@
-CC = gcc
+# NOTE: Here I do a little trick to determine whether we are using GCC or CLANG.
+# As you may know, on macOS, running '/usr/bin/gcc' will in fact run 'clang'. Here,
+# I want to make it explicite which one is being used, because I need it later on, at
+# line 47, as part of an "if/else" block, because clang and gcc appear to have a few
+# differences with regards to compiling for POSIX (e.g., clang does not require the
+# -lpthread flag, while GCC appears to require so; and clang will compile for POSIX by
+# default, even when using -std=c17, while -std=gnu17 appears to be required for GCC).
+CC = $(shell if gcc --version | grep -q 'clang'; then echo "clang"; else echo "gcc"; fi;)
 ARCHIVER = ar
 
 BUILD_DIR = build
@@ -21,7 +28,7 @@ INSTALL_PATH_INCLUDE = /usr/local/include
 LIB_NAME = fancy_string
 LIB_FULL_NAME = fancy_string.$(LIB_VERSION)
 
-C_VERSION = c17
+C_VERSION = gnu17
 OPTIMIZATION_LEVEL = -O0
 
 # Other flags to consider: -g (for debugging); -Wextra (I should use that as well)
@@ -37,6 +44,12 @@ CFLAGS_TEST = $(OPTIMIZATION_LEVEL) \
 	-std=$(C_VERSION) \
 	-Wall -Werror -Wextra -pedantic \
 	-I./$(INCLUDE_DIR) -I./c-fancy-memory/include
+ifneq ($(CC),clang)
+	CFLAGS_LIB += -pthread
+	CFLAGS_TEST += -pthread
+else
+	C_VERSION = c17
+endif
 CFLAGS_EXAMPLES = $(CFLAGS_TEST)
 ARCHIVER_FLAGS = rcs
 
