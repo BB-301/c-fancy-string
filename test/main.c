@@ -464,9 +464,6 @@ void test_fancy_string_regex_debug(void)
         FILE *verbose_false;
         verbose_false = fmemopen(buffer_verbose_false, buffer_size, "w+");
         assert(verbose_false != NULL);
-        // Thank to [drmalex07](https://gist.github.com/drmalex07/4ffe7b7599ec1fbfeb5364bdb0e3c0ef) for this.
-        // One macOS (with clang), everything worked fine without `setvbuf`, but 
-        // this example was not running as expected on some linux distributions.
         setvbuf(verbose_false, NULL, _IONBF, 0);
         fancy_string_regex_debug(re, verbose_false, false);
         assert(strlen(buffer_verbose_false) > 0);

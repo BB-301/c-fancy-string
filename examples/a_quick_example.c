@@ -33,7 +33,7 @@ int main(void)
     // fancy_string_t[36](Greetings: Hello, lib<fancy_string>!)
 
     // So far, we've used methods suffixed with `_value`, which means that
-    // the take as argument a string literal. But the library also have the
+    // they take as argument a string literal. But the library also has the
     // matching methods for string objects. Let's append something to our string:
     {
         // Instantiate a new string object containing the suffix to be appended to `s`.
