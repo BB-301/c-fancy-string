@@ -38,7 +38,7 @@
 
 #define __FANCY_STRING_LIB_VERSION_MAJOR__ 0
 #define __FANCY_STRING_LIB_VERSION_MINOR__ 1
-#define __FANCY_STRING_LIB_VERSION_REVISION__ 0
+#define __FANCY_STRING_LIB_VERSION_REVISION__ 1
 
 #define FANCY_STRING_MEMORY_USAGE_FEATURE_ENABLED_REQUIRED_ERROR_MESSAGE "This method requires that the library has been built using the 'FANCY_STRING_MEMORY_USAGE_FEATURE_ENABLED = 1' preprocessor flag in order to be used."
 
@@ -124,6 +124,22 @@ fancy_string_t *fancy_string_create(char const *const value)
     self->value = copy_value(value);
     self->n = strlen(self->value);
     return self;
+}
+
+fancy_string_t *fancy_string_from_copied_memory(void const *const pointer, size_t n)
+{
+    assert(pointer != NULL);
+
+    if (n == 0)
+    {
+        return fancy_string_create_empty();
+    }
+    char *tmp = my_malloc(sizeof(char) * (n + 1));
+    memcpy(tmp, pointer, n);
+    tmp[n] = '\0';
+    fancy_string_t *s = fancy_string_create(tmp);
+    my_free(tmp);
+    return s;
 }
 
 fancy_string_t *fancy_string_from_stream(FILE *stream)
@@ -841,6 +857,15 @@ fancy_string_t *fancy_string_uppercased(fancy_string_t const *const self)
     return clone;
 }
 
+void fancy_string_line_break(fancy_string_t *const self, bool with_carriage_return)
+{
+    if (with_carriage_return)
+    {
+        fancy_string_append_value(self, "\r");
+    }
+    fancy_string_append_value(self, "\n");
+}
+
 fancy_string_regex_t *fancy_string_regex_create(fancy_string_t const *const string, fancy_string_t const *const pattern, ssize_t n_max_matches)
 {
     assert(string != NULL);
@@ -1232,6 +1257,17 @@ fancy_string_regex_match_info_t fancy_string_regex_match_info_for_index(fancy_st
     info.end = self->end_array[index];
 
     return info;
+}
+
+fancy_string_t *fancy_string_regex_string_for_match_at_index(fancy_string_regex_t const *const self, size_t index)
+{
+    assert(self != NULL);
+
+    if (self->n_matches <= index)
+    {
+        return NULL;
+    }
+    return fancy_string_substring(self->string, self->start_array[index], self->end_array[index]);
 }
 
 // -----------------------------------------------

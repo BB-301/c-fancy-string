@@ -26,12 +26,13 @@
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "fancy_string.h"
 
 #define LOG_FUNCTION_CALLS
 
-#define TEST_LOOP_NUMBER_OF_ITERATIONS (100000)
+#define TEST_LOOP_NUMBER_OF_ITERATIONS (200000)
 #define TEST_LOOP_SLEEP_DURATION_SECS (1)
 #ifndef FANCY_STRING_TEST_LOOP_ENABLED
 #define FANCY_STRING_TEST_LOOP_ENABLED (0)
@@ -49,6 +50,9 @@
 #define LOG() (void)0
 #endif
 
+void test_fancy_string_from_copied_memory(void);
+void test_fancy_string_regex_string_for_match_at_index(void);
+void test_fancy_string_line_break(void);
 void test_fancy_string_regex_create(void);
 void test_fancy_string_regex_to_string_with_updated_matches(void);
 void test_fancy_string_regex_destroy(void);
@@ -295,6 +299,9 @@ void run_tests(void)
     test_fancy_string_regex_destroy();
     test_fancy_string_regex_to_string_with_updated_matches();
     test_fancy_string_regex_create();
+    test_fancy_string_line_break();
+    test_fancy_string_regex_string_for_match_at_index();
+    test_fancy_string_from_copied_memory();
 }
 
 int main(void)
@@ -329,6 +336,98 @@ int main(void)
     }
 
     return 0;
+}
+
+void test_fancy_string_from_copied_memory(void)
+{
+    LOG();
+    {
+        char tmp[5] = {'h', 'e', 'l', 'l', 'o'};
+        {
+            fancy_string_t *s = fancy_string_from_copied_memory(tmp, 5);
+            assert(fancy_string_equals_value(s, "hello"));
+            fancy_string_destroy(s);
+        }
+    }
+    {
+        char tmp[6] = {'h', 'e', 'l', 'l', 'o', '\0'};
+        {
+            fancy_string_t *s = fancy_string_from_copied_memory(tmp, 10);
+            assert(fancy_string_equals_value(s, "hello"));
+            fancy_string_destroy(s);
+        }
+    }
+    {
+        char *message = "I only need this part; not this part.";
+        fancy_string_t *s = fancy_string_from_copied_memory(message, 21);
+        assert(fancy_string_equals_value(s, "I only need this part"));
+        fancy_string_destroy(s);
+    }
+    {
+        char *message = "I only want this part; not this one.";
+        {
+            fancy_string_t *s = fancy_string_from_copied_memory(message, 21);
+            assert(fancy_string_equals_value(s, "I only want this part"));
+            fancy_string_destroy(s);
+        }
+        {
+            fancy_string_t *s = fancy_string_from_copied_memory(message + 7, 4);
+            assert(fancy_string_equals_value(s, "want"));
+            fancy_string_destroy(s);
+        }
+    }
+}
+
+void test_fancy_string_regex_string_for_match_at_index(void)
+{
+    LOG();
+    {
+        fancy_string_t *s = fancy_string_create("Hello, lib<fancy_string>! My name is Francis. Can I call you lib<fancy-string> instead?");
+        fancy_string_t *pattern = fancy_string_create("[a-z]*<[-_a-z]*>");
+        fancy_string_regex_t *re = fancy_string_regex_create(s, pattern, -1);
+        assert(re != NULL);
+        assert(fancy_string_regex_match_count(re) == 2);
+
+        {
+            fancy_string_t *lib_name = fancy_string_regex_string_for_match_at_index(re, 0);
+            assert(re != NULL);
+            assert(fancy_string_equals_value(lib_name, "lib<fancy_string>"));
+            fancy_string_destroy(lib_name);
+        }
+
+        {
+            fancy_string_t *lib_name = fancy_string_regex_string_for_match_at_index(re, 1);
+            assert(re != NULL);
+            assert(fancy_string_equals_value(lib_name, "lib<fancy-string>"));
+            fancy_string_destroy(lib_name);
+        }
+
+        {
+            fancy_string_t *should_be_null = fancy_string_regex_string_for_match_at_index(re, 10);
+            assert(should_be_null == NULL);
+        }
+
+        fancy_string_regex_destroy(re);
+        fancy_string_destroy(pattern);
+        fancy_string_destroy(s);
+    }
+}
+
+void test_fancy_string_line_break(void)
+{
+    LOG();
+    {
+        fancy_string_t *s = fancy_string_create("My name is Francis.");
+        fancy_string_line_break(s, false);
+        assert(fancy_string_equals_value(s, "My name is Francis.\n"));
+        fancy_string_trim(s);
+        assert(fancy_string_equals_value(s, "My name is Francis."));
+        fancy_string_line_break(s, true);
+        assert(fancy_string_equals_value(s, "My name is Francis.\r\n"));
+        fancy_string_trim(s);
+        assert(fancy_string_equals_value(s, "My name is Francis."));
+        fancy_string_destroy(s);
+    }
 }
 
 void test_fancy_string_regex_create(void)
@@ -3669,4 +3768,28 @@ void test_fancy_string_library_version(void)
     {
         fprintf(stdout, "\033[34mRunning unit tests for \033[33mlibfancy_string.%i.%i.%i\033[0m\n", major, minor, revision);
     }
+
+#if (FANCY_STRING_TEST_LOOP_ENABLED == 0)
+    //  NOTE: This is to make sure that I don't forget the
+    //  version number in `./src/fancy_string.c` when updating
+    //  it in VERSION (and vice versa).
+    FILE *version_file_pointer = fopen("./VERSION", "r");
+    if (version_file_pointer == NULL)
+    {
+        perror("fopen on ./VERSION file failed");
+        exit(EXIT_FAILURE);
+    }
+    fancy_string_t *version = fancy_string_from_stream(version_file_pointer);
+    assert(version != NULL);
+    fancy_string_trim(version);
+
+    char version_buffer[30];
+    if (sprintf(version_buffer, "%d.%d.%d", major, minor, revision) == 0)
+    {
+        fprintf(stderr, "Failed to write to 'version_buffer'");
+        exit(EXIT_FAILURE);
+    }
+    assert(fancy_string_equals_value(version, version_buffer));
+    fancy_string_destroy(version);
+#endif
 }

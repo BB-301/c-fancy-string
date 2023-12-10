@@ -7,7 +7,7 @@ int main(void)
 {
     fancy_string_t *s = fancy_string_create("jules julie julius jean jeffrey joey john joe");
     // We match character sequences that start with "j" and end with "e " or "e" at the end of a line,
-    //  with anything in the middle corresponding to ACSII lowercase letters (i.e. a to z). In this case, that
+    // with anything in the middle corresponding to ASCII lowercase letters (i.e. a to z). In this case, that
     // means that "julie " and "joe" will be matched.
     fancy_string_t *p = fancy_string_create("j[a-z]*e($|[ ]{1})");
 

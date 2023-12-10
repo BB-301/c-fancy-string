@@ -14,6 +14,13 @@
         <name>string.h</name>
         <filename>man0/string.h.0p.html</filename>
         <member kind="function">
+            <type>memcpy</type>
+            <name>memcpy</name>
+            <anchorfile>man3/memcpy.3.html.html</anchorfile>
+            <anchor></anchor>
+            <arglist>(void dest[restrict .n], const void src[restrict .n], size_t n)</arglist>
+        </member>
+        <member kind="function">
             <type>strlen</type>
             <name>strlen</name>
             <anchorfile>man3/strlen.3p.html.html</anchorfile>
@@ -38,6 +45,10 @@
             <anchor></anchor>
             <arglist>(int c)</arglist>
         </member>
+    </compound>
+    <compound kind="file">
+        <name>sys/types.h</name>
+        <filename>man0/sys_types.h.0p.html</filename>
     </compound>
     <compound kind="file">
         <name>errno.h</name>

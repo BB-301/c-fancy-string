@@ -226,6 +226,7 @@ We end this section with a simple list of notable characteristics and behaviors 
     * [fancy_string_memory_tracking_multi_thread.c](examples/fancy_string_memory_tracking_multi_thread.c)
     * [fancy_string_memory_tracking_single_thread.c](examples/fancy_string_memory_tracking_single_thread.c)
   * The [test/main.c](./test/main.c) file also makes use of the feature to perform the integration test.
+* In a few instances throughout this project's documentation and the codebase, I use the term `callback` to refer to function signatures such as, for instance, `fancy_string_find_t`, as well as functions (conforming to such signatures) being passed as arguments to methods such as, for instance, `fancy_string_array_find_index`. I'm adding a note here about this, because I don't want to cause confusion with that term. In some contexts, the term `callback` is often used to refer to a function that will be executed after an asynchronous operation completes. In other contexts, however, the term is more generally simply used to refer to a function that gets passed as argument to another function (and which is expected to be called inside that function, when needed). In the context of this library, it is the second, more general definition that applies.
 
 ## How to install
 

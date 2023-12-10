@@ -1,0 +1,17 @@
+# Version 0.1.1
+
+* Added this file (i.e, `./CHANGELOG`) to the project.
+* Added three new methods to the public API (in `./include/fancy_string.h`); i.e.,
+  * `fancy_string_from_copied_memory`
+  * `fancy_string_line_break`
+  * `fancy_string_regex_string_for_match_at_index`
+* Added two new examples; i.e.,
+  * `./examples/fancy_string_from_copied_memory.c`
+  * `./examples/fancy_string_regex_string_for_match_at_index.c`
+* Updated the `./README.md` file with a note about the use of the term
+`callback` throughout the project's documentation.
+* Updated the `./test/main.c` file with new unit test functions for the
+three new methods listed above. Also added a safety check that makes
+sure that the library version returned by the `fancy_string_library_version`
+method corresponds to the current project's version indicated in the 
+`./VERSION` file.

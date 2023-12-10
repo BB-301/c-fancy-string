@@ -236,6 +236,26 @@ fancy_string_memory_usage_mode_t fancy_string_memory_usage_mode(void);
 fancy_string_t *fancy_string_create(char const *const value);
 
 /**
+ * @brief Instantiates a string object with initial internal state obtained
+ * by copying \p n bytes from \p pointer .
+ * @param pointer A pointer to the memory to be copied (i.e., \p n bytes of it) and
+ * used as internal state for the new string object.
+ * @param n The number of bytes to be copied from the memory pointed to by \p pointer .
+ * @return \ref fancy_string_t* A pointer to the created string object.
+ * @see fancy_string_create, fancy_string_create_empty
+ * @note Internally, this method temporarily allocates `sizeof(char*) * (n + 1)` bytes and
+ * uses them to make a copy of \p pointer 's first \p n bytes using \ref memcpy , and then
+ * adds the null character `\0` to it, and passes that temporary null-terminated string
+ * to \ref fancy_string_create to create the string object.
+ * Obviously, this method should only be used when a null-terminated
+ * string is not already available to be passed to \ref fancy_string_create directly, or when
+ * only a specific segment of a string is needed.
+ * @par Example:
+ * @include examples/fancy_string_from_copied_memory.c
+ */
+fancy_string_t *fancy_string_from_copied_memory(void const *const pointer, size_t n);
+
+/**
  * @brief Instantiates a string object and fills its internal state
  * with the string data read from \p stream .
  * @param stream A pointer to readable stream (e.g., a file pointer that has
@@ -775,6 +795,18 @@ void fancy_string_uppercase(fancy_string_t *const self);
  */
 fancy_string_t *fancy_string_uppercased(fancy_string_t const *const self);
 
+/**
+ * @brief Appends a line break character (i.e., `\\n`) at the end of the object's
+ * internal string data.
+ * @param self A pointer to the \ref fancy_string_t instance at the end of which
+ * to add a line break character.
+ * @param with_carriage_return A boolean value indicating whether, in addition to the line break
+ * character `\\n`, a carriage return character (i.e., `\\r`) should also be added. If `true`, the
+ * two characters will be appended in the following order: `\\r\\n`. If `false`, only `\\n` will be
+ * appended.
+ */
+void fancy_string_line_break(fancy_string_t *const self, bool with_carriage_return);
+
 // -----------------------------------------------
 //                  REGEX (methods)
 // -----------------------------------------------
@@ -966,6 +998,20 @@ fancy_string_t *fancy_string_regex_to_string_with_updated_matches(fancy_string_r
  * @include examples/fancy_string_regex_match_info_for_index.c
  */
 fancy_string_regex_match_info_t fancy_string_regex_match_info_for_index(fancy_string_regex_t const *const self, size_t index);
+
+/**
+ * @brief Retrieves the \p index -th matched character sequence (if any), and returns it as a
+ * memory-independent string object.
+ * @param self A pointer to the \ref fancy_string_regex_t instance for which to retrieve
+ * a substring of the original string object for the match at position \p index .
+ * @param index The position of the match inside \p self , for which a substring is to be created
+ * and returned.
+ * @return \ref fancy_string_t* A pointer to a \ref fancy_string_t instance containing the \p index -th matched
+ * character sequence. If \p index is out of bounds, the \ref NULL pointer will be returned.
+ * @par Example:
+ * @include examples/fancy_string_regex_string_for_match_at_index.c
+ */
+fancy_string_t *fancy_string_regex_string_for_match_at_index(fancy_string_regex_t const *const self, size_t index);
 
 // -----------------------------------------------
 //                  ARRAY (methods)
